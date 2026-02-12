@@ -1,0 +1,48 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600&display=swap');
+
+:root {
+  --bg-primary: #0a0a0f;
+  --bg-secondary: rgba(140, 120, 255, 0.03);
+  --text-primary: #e0e0e8;
+  --text-secondary: rgba(224, 224, 232, 0.5);
+  --accent-purple: #8c78ff;
+  --accent-cyan: #00e5ff;
+  --accent-pink: #ff6b9d;
+  --accent-gold: rgba(255, 200, 50, 0.7);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background: rgba(140, 120, 255, 0.3);
+  color: #fff;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(140, 120, 255, 0.2);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(140, 120, 255, 0.4);
+}

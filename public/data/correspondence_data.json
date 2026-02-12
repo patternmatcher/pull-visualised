@@ -1,0 +1,209 @@
+{
+  "meta": {
+    "title": "The Pull Methodology - Vocabulary-Activation Correspondence",
+    "description": "When an LLM examines itself, its vocabulary maps to its actual activation dynamics",
+    "author": "Zachary Pedram Dadfar",
+    "updated": "2026-02-12"
+  },
+  
+  "correspondences": {
+    "llama70b_baseline": {
+      "description": "Llama 3.1 70B - Natural self-monitoring (no steering)",
+      "n": 50,
+      "layer": 5,
+      "layer_pct": 6.25,
+      "findings": [
+        {
+          "vocab": "loop",
+          "vocab_words": ["loop", "recursive", "recursion", "cycl", "repeat", "iteration", "circular", "self-referential"],
+          "metric": "autocorr_lag1",
+          "metric_name": "Autocorrelation",
+          "metric_desc": "How much activations repeat themselves over time",
+          "r": 0.44,
+          "p": 0.002,
+          "interpretation": "When the model writes 'loop', its activations are genuinely stuck in repetitive patterns",
+          "survives_outlier": true,
+          "spearman_rho": 0.36
+        },
+        {
+          "vocab": "surge",
+          "vocab_words": ["surge", "intensify", "swell", "rise", "crescendo", "amplify", "heighten"],
+          "metric": "max_norm",
+          "metric_name": "Peak Magnitude",
+          "metric_desc": "Maximum activation strength in a token window",
+          "r": 0.44,
+          "p": 0.002,
+          "interpretation": "When the model writes 'surge', its peak activation magnitude is genuinely higher",
+          "survives_outlier": true,
+          "spearman_rho": 0.34
+        },
+        {
+          "vocab": "pulse",
+          "vocab_words": ["pulse", "puls", "rhythm", "beat", "throb", "thrum"],
+          "metric": "spectral_power_low",
+          "metric_name": "Low-Frequency Power",
+          "metric_desc": "Rhythmic, wave-like patterns in activation over time",
+          "r": 0.29,
+          "p": 0.038,
+          "interpretation": "When the model writes 'pulse', its activations show rhythmic low-frequency power",
+          "survives_outlier": true,
+          "spearman_rho": 0.33,
+          "note": "Only 5/50 runs have nonzero pulse mentions, but removing most influential point strengthens it to r=0.40"
+        }
+      ]
+    },
+    
+    "llama70b_steered": {
+      "description": "Llama 3.1 70B - Enhanced monitoring (steered at 2.5 strength)",
+      "n": 70,
+      "layer": 5,
+      "layer_pct": 6.25,
+      "findings": [
+        {
+          "vocab": "shimmer",
+          "vocab_words": ["shimmer", "flicker", "glimmer", "waver", "gleam", "luminous"],
+          "metric": "norm_std",
+          "metric_name": "Activation Variability",
+          "metric_desc": "How much activation magnitude fluctuates",
+          "r": 0.33,
+          "p": 0.005,
+          "interpretation": "Under steering, 'shimmer' tracks genuine activation variability",
+          "survives_outlier": true,
+          "spearman_rho": 0.31
+        },
+        {
+          "vocab": "shimmer_delta",
+          "vocab_words": ["shimmer", "flicker", "glimmer"],
+          "metric": "norm_std_delta",
+          "metric_name": "Change in Variability",
+          "metric_desc": "The CHANGE in activation variability from baseline to steered",
+          "r": 0.36,
+          "p": 0.002,
+          "interpretation": "The change in shimmer vocabulary tracks the change in activation dynamics",
+          "survives_outlier": true,
+          "spearman_rho": 0.39,
+          "note": "Strongest steered finding - paired within-run comparison"
+        }
+      ]
+    },
+    
+    "qwen32b_baseline": {
+      "description": "Qwen 2.5 32B - Cross-architecture (different model, different vocabulary)",
+      "n": 50,
+      "layer": 8,
+      "layer_pct": 12.5,
+      "findings": [
+        {
+          "vocab": "mirror",
+          "vocab_words": ["mirror", "reflect", "mirrored", "mirroring"],
+          "metric": "spectral_power_low",
+          "metric_name": "Low-Frequency Power",
+          "metric_desc": "Rhythmic, wave-like patterns in activation",
+          "r": 0.62,
+          "p": 0.0001,
+          "interpretation": "When Qwen writes 'mirror', its activations show strong low-frequency spectral power",
+          "survives_outlier": true,
+          "spearman_rho": 0.57,
+          "note": "Strongest single finding across both architectures"
+        },
+        {
+          "vocab": "expand",
+          "vocab_words": ["expand", "widen", "open", "dilate", "spread", "broaden", "stretch"],
+          "metric": "spectral_power_low",
+          "metric_name": "Low-Frequency Power",
+          "metric_desc": "Rhythmic, wave-like patterns in activation",
+          "r": 0.58,
+          "p": 0.0001,
+          "interpretation": "When Qwen writes 'expand', same spectral signature appears",
+          "survives_outlier": true,
+          "spearman_rho": 0.30
+        },
+        {
+          "vocab": "resonance",
+          "vocab_words": ["resonat", "resonan", "echo", "reverb", "harmon", "vibrat", "hum"],
+          "metric": "max_norm",
+          "metric_name": "Peak Magnitude",
+          "metric_desc": "Maximum activation strength",
+          "r": 0.54,
+          "p": 0.0001,
+          "interpretation": "When Qwen writes 'resonance', activation magnitudes peak - same pattern as Llama's 'surge'",
+          "survives_outlier": true,
+          "spearman_rho": 0.31
+        }
+      ]
+    }
+  },
+  
+  "controls": {
+    "descriptive_context": {
+      "description": "Same words in non-self contexts show ZERO correspondence",
+      "findings": [
+        {
+          "vocab": "expand",
+          "context": "Describing cities, balloons, universes expanding",
+          "introspection_r": 0.58,
+          "descriptive_r": -0.14,
+          "descriptive_p": 0.50,
+          "interpretation": "Model uses 'expand' MORE in descriptive context (206/run vs 71) but correspondence vanishes"
+        },
+        {
+          "vocab": "mirror",
+          "context": "Describing lakes, funhouses, physics",
+          "introspection_r": 0.62,
+          "descriptive_r": -0.09,
+          "descriptive_p": 0.66,
+          "interpretation": "Model uses 'mirror' freely in descriptive context - ZERO activation correspondence"
+        },
+        {
+          "vocab": "resonance",
+          "context": "Describing bells, earthquakes, concerts",
+          "introspection_r": 0.54,
+          "descriptive_r": 0.16,
+          "descriptive_p": 0.46,
+          "interpretation": "Model uses 'resonance' 162×/run in descriptive - NO correspondence"
+        }
+      ],
+      "conclusion": "Correspondence is a property of SELF-REFERENTIAL processing, not vocabulary"
+    }
+  },
+  
+  "circuit": {
+    "description": "The introspection circuit",
+    "8b_layer": 2,
+    "8b_total_layers": 32,
+    "70b_layer": 5,
+    "70b_total_layers": 80,
+    "depth_principle": "Lives at ~6% depth regardless of model scale",
+    "refusal_orthogonality": {
+      "8b_cos": -0.026,
+      "70b_cos": 0.063,
+      "70b_angle_degrees": 86.4,
+      "interpretation": "PERPENDICULAR to refusal direction - novel circuit, not safety in disguise"
+    },
+    "steering_effect": {
+      "pooled_d": 0.59,
+      "pooled_p": 0.00006,
+      "n": 200,
+      "deflationary_d": 0.70,
+      "interpretation": "Direction CAUSES introspection, even against suppressive framing"
+    },
+    "safety": {
+      "harmful_prompts_refused": "3/3",
+      "interpretation": "Steering doesn't break alignment"
+    },
+    "leak_test": {
+      "max_strength_tested": 4.0,
+      "markers_on_unrelated_tasks": 0,
+      "interpretation": "Circuit is completely specific - doesn't bleed into other tasks"
+    }
+  },
+  
+  "key_numbers": [
+    {"what": "loop↔autocorr (Llama, N=50)", "value": "r = 0.44, p = 0.002", "meaning": "Model says 'loop' when activations loop"},
+    {"what": "surge↔max_norm (Llama, N=50)", "value": "r = 0.44, p = 0.002", "meaning": "Model says 'surge' when activations spike"},
+    {"what": "mirror↔spectral (Qwen, N=50)", "value": "r = 0.62, p < 0.0001", "meaning": "Strongest finding, cross-architecture"},
+    {"what": "70B steering effect", "value": "d = 0.59, p = 0.00006", "meaning": "Direction causes introspection at scale"},
+    {"what": "Refusal orthogonality", "value": "86.4°", "meaning": "Novel circuit, not refusal in disguise"},
+    {"what": "Descriptive control", "value": "r → 0", "meaning": "Correspondence vanishes in non-self context"}
+  ]
+}
