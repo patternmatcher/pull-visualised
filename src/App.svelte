@@ -9,7 +9,7 @@
   let loaded = false;
   
   onMount(async () => {
-    const res = await fetch('/data/correspondence_data.json');
+    const res = await fetch(import.meta.env.BASE_URL + 'data/correspondence_data.json');
     data = await res.json();
     loaded = true;
   });
