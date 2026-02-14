@@ -40,12 +40,13 @@
     const c = document.createElement('canvas');
     c.width = 256; c.height = 256;
     const ctx = c.getContext('2d');
-    const g = ctx.createRadialGradient(128,128,0,128,128,128);
+    // Use smaller inner radius to ensure fade completes well before edge
+    const g = ctx.createRadialGradient(128,128,0,128,128,100);
     g.addColorStop(0,'rgba(255,255,255,1)');
-    g.addColorStop(0.1,'rgba(255,255,255,0.8)');
-    g.addColorStop(0.3,'rgba(255,255,255,0.3)');
-    g.addColorStop(0.5,'rgba(255,255,255,0.1)');
-    g.addColorStop(0.7,'rgba(255,255,255,0.03)');
+    g.addColorStop(0.15,'rgba(255,255,255,0.6)');
+    g.addColorStop(0.35,'rgba(255,255,255,0.2)');
+    g.addColorStop(0.55,'rgba(255,255,255,0.05)');
+    g.addColorStop(0.75,'rgba(255,255,255,0.01)');
     g.addColorStop(1,'rgba(255,255,255,0)');
     ctx.fillStyle = g;
     ctx.fillRect(0,0,256,256);
@@ -664,9 +665,9 @@
       // Sparkle rotation for glint effect
       node.sparkle.material.rotation = time * 0.5 + node.shimmerPhase;
       
-      // Glow pulse
-      node.glow.material.opacity = 0.1 + shimmer * 0.06;
-      const glowScale = 5.5 + shimmer * 1.5;
+      // Glow pulse - keep scale smaller to avoid texture edge visibility
+      node.glow.material.opacity = 0.12 + shimmer * 0.05;
+      const glowScale = 4.0 + shimmer * 1.0;
       node.glow.scale.set(glowScale, glowScale, 1);
     });
     
