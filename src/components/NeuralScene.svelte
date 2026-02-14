@@ -368,17 +368,7 @@
       mesh.position.copy(basePos);
       scene.add(mesh);
       
-      // Jewel sparkle sprite
-      const sparkMat = new THREE.SpriteMaterial({
-        map: jewelTexture,
-        color: colorSet.glow,
-        transparent: true, opacity: 0.6,
-        blending: THREE.AdditiveBlending
-      });
-      const sparkle = new THREE.Sprite(sparkMat);
-      sparkle.scale.set(2.5, 2.5, 1);
-      sparkle.position.copy(basePos);
-      scene.add(sparkle);
+      // Sparkle sprite removed - was causing square pulsing artifacts
       
       // Outer glow halo
       const glowMat = new THREE.SpriteMaterial({
@@ -395,7 +385,7 @@
       const findings = allFindings.filter(f => f.vocab.replace('_delta','') === vocab);
       
       wordNodes.push({
-        mesh, sparkle, glow, vocab, findings,
+        mesh, glow, vocab, findings,
         basePos: basePos.clone(), color: colorSet, type: 'vocab',
         orbitPhase: Math.random()*Math.PI*2,
         orbitRadius: 0.25 + Math.random()*0.4,
@@ -460,16 +450,7 @@
       mesh.position.copy(basePos);
       scene.add(mesh);
       
-      const sparkMat = new THREE.SpriteMaterial({
-        map: jewelTexture,
-        color: colorSet.glow,
-        transparent: true, opacity: 0.5,
-        blending: THREE.AdditiveBlending
-      });
-      const sparkle = new THREE.Sprite(sparkMat);
-      sparkle.scale.set(2.8, 2.8, 1);
-      sparkle.position.copy(basePos);
-      scene.add(sparkle);
+      // Sparkle sprite removed - was causing square pulsing artifacts
       
       const glowMat = new THREE.SpriteMaterial({
         map: glowTexture,
@@ -485,7 +466,7 @@
       const findings = allFindings.filter(f => f.metric_name === metric);
       
       metricNodes.push({
-        mesh, sparkle, glow, metric, findings,
+        mesh, glow, metric, findings,
         basePos: basePos.clone(), color: colorSet, type: 'metric',
         orbitPhase: Math.random()*Math.PI*2,
         orbitRadius: 0.2 + Math.random()*0.35,
@@ -647,22 +628,14 @@
       node.mesh.rotation.y += node.rotSpeed.y * 0.016;
       node.mesh.rotation.z += node.rotSpeed.z * 0.016;
       
-      node.sparkle.position.copy(node.mesh.position);
       node.glow.position.copy(node.mesh.position);
       
-      // SHIMMER — pulsing emissive intensity + sparkle scale oscillation
+      // SHIMMER — pulsing emissive intensity
       const shimmer = Math.sin(time * node.shimmerSpeed + node.shimmerPhase);
       const shimmer2 = Math.sin(time * node.shimmerSpeed * 1.7 + node.shimmerPhase * 0.6);
       
       // Emissive pulse
       node.mesh.material.emissiveIntensity = 0.5 + shimmer * 0.4;
-      
-      // Sparkle scale pulse — the "twinkle"
-      const sparkScale = 2.2 + shimmer * 0.6 + shimmer2 * 0.3;
-      node.sparkle.scale.set(sparkScale, sparkScale, 1);
-      node.sparkle.material.opacity = 0.4 + shimmer * 0.25 + shimmer2 * 0.1;
-      // Sparkle rotation for glint effect
-      node.sparkle.material.rotation = time * 0.5 + node.shimmerPhase;
       
       // Glow pulse
       node.glow.material.opacity = 0.1 + shimmer * 0.06;

@@ -15,9 +15,9 @@
   
   // Top findings sorted by |r|
   const topFindings = [
-    ...baseline.map(f => ({...f, source: 'Llama 70B · Baseline'})),
-    ...steered.map(f => ({...f, source: 'Llama 70B · Steered'})),
-    ...qwen.map(f => ({...f, source: 'Qwen 32B · Baseline'})),
+    ...baseline.map(f => ({...f, source: 'Llama 70B, Baseline'})),
+    ...steered.map(f => ({...f, source: 'Llama 70B, Steered'})),
+    ...qwen.map(f => ({...f, source: 'Qwen 32B, Baseline'})),
   ].sort((a,b) => Math.abs(b.r) - Math.abs(a.r));
 
   function strengthClass(r) {
@@ -104,7 +104,7 @@
                 <p class="j-note">{finding.note}</p>
               {/if}
               {#if finding.spearman_rho}
-                <p class="j-extra">Spearman ρ = {finding.spearman_rho} · Non-parametric confirmation</p>
+                <p class="j-extra">Spearman ρ = {finding.spearman_rho}, Non-parametric confirmation</p>
               {/if}
             </div>
           {/if}
