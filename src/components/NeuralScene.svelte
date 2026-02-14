@@ -46,16 +46,21 @@
     const c = document.createElement('canvas');
     c.width = 256; c.height = 256;
     const ctx = c.getContext('2d');
-    // Use smaller inner radius to ensure fade completes well before edge
-    const g = ctx.createRadialGradient(128,128,0,128,128,100);
+    // Clear canvas to fully transparent first
+    ctx.clearRect(0,0,256,256);
+    // Draw circular glow - gradient fills only a circle, not the whole canvas
+    const g = ctx.createRadialGradient(128,128,0,128,128,120);
     g.addColorStop(0,'rgba(255,255,255,1)');
-    g.addColorStop(0.15,'rgba(255,255,255,0.6)');
-    g.addColorStop(0.35,'rgba(255,255,255,0.2)');
-    g.addColorStop(0.55,'rgba(255,255,255,0.05)');
-    g.addColorStop(0.75,'rgba(255,255,255,0.01)');
+    g.addColorStop(0.15,'rgba(255,255,255,0.5)');
+    g.addColorStop(0.35,'rgba(255,255,255,0.15)');
+    g.addColorStop(0.55,'rgba(255,255,255,0.04)');
+    g.addColorStop(0.75,'rgba(255,255,255,0.005)');
     g.addColorStop(1,'rgba(255,255,255,0)');
     ctx.fillStyle = g;
-    ctx.fillRect(0,0,256,256);
+    // Fill only a circle, not rectangle - this prevents any edge artifacts
+    ctx.beginPath();
+    ctx.arc(128, 128, 120, 0, Math.PI * 2);
+    ctx.fill();
     return new THREE.CanvasTexture(c);
   }
   
@@ -74,37 +79,41 @@
   }
   
   function makeJewelTexture() {
-    // Sharp-edged gem sprite with inner sparkle
+    // Sharp-edged gem sprite with inner sparkle - circular to avoid square edges
     const c = document.createElement('canvas');
     c.width = 128; c.height = 128;
     const ctx = c.getContext('2d');
-    const g = ctx.createRadialGradient(64,64,0,64,64,48);
+    ctx.clearRect(0,0,128,128);
+    const g = ctx.createRadialGradient(64,64,0,64,64,56);
     g.addColorStop(0,'rgba(255,255,255,1)');
-    g.addColorStop(0.15,'rgba(255,255,255,0.95)');
-    g.addColorStop(0.4,'rgba(255,255,255,0.5)');
-    g.addColorStop(0.6,'rgba(255,255,255,0.25)');
-    g.addColorStop(0.85,'rgba(255,255,255,0.08)');
+    g.addColorStop(0.15,'rgba(255,255,255,0.9)');
+    g.addColorStop(0.35,'rgba(255,255,255,0.4)');
+    g.addColorStop(0.55,'rgba(255,255,255,0.15)');
+    g.addColorStop(0.75,'rgba(255,255,255,0.03)');
     g.addColorStop(1,'rgba(255,255,255,0)');
     ctx.fillStyle = g;
-    ctx.fillRect(0,0,128,128);
-    // Star sparkle cross
+    // Fill only circle
+    ctx.beginPath();
+    ctx.arc(64, 64, 56, 0, Math.PI * 2);
+    ctx.fill();
+    // Star sparkle cross - shorter to stay within circle
     ctx.globalCompositeOperation = 'lighter';
-    const sg = ctx.createLinearGradient(0,64,128,64);
+    const sg = ctx.createLinearGradient(16,64,112,64);
     sg.addColorStop(0,'rgba(255,255,255,0)');
-    sg.addColorStop(0.4,'rgba(255,255,255,0.15)');
-    sg.addColorStop(0.5,'rgba(255,255,255,0.5)');
-    sg.addColorStop(0.6,'rgba(255,255,255,0.15)');
+    sg.addColorStop(0.35,'rgba(255,255,255,0.1)');
+    sg.addColorStop(0.5,'rgba(255,255,255,0.4)');
+    sg.addColorStop(0.65,'rgba(255,255,255,0.1)');
     sg.addColorStop(1,'rgba(255,255,255,0)');
     ctx.fillStyle = sg;
-    ctx.fillRect(0,58,128,12);
-    const sg2 = ctx.createLinearGradient(64,0,64,128);
+    ctx.fillRect(16,60,80,8);
+    const sg2 = ctx.createLinearGradient(64,16,64,112);
     sg2.addColorStop(0,'rgba(255,255,255,0)');
-    sg2.addColorStop(0.4,'rgba(255,255,255,0.15)');
-    sg2.addColorStop(0.5,'rgba(255,255,255,0.5)');
-    sg2.addColorStop(0.6,'rgba(255,255,255,0.15)');
+    sg2.addColorStop(0.35,'rgba(255,255,255,0.1)');
+    sg2.addColorStop(0.5,'rgba(255,255,255,0.4)');
+    sg2.addColorStop(0.65,'rgba(255,255,255,0.1)');
     sg2.addColorStop(1,'rgba(255,255,255,0)');
     ctx.fillStyle = sg2;
-    ctx.fillRect(58,0,12,128);
+    ctx.fillRect(60,16,8,80);
     return new THREE.CanvasTexture(c);
   }
   
@@ -445,7 +454,9 @@
         map: jewelTexture,
         color: colorSet.glow,
         transparent: true, opacity: 0.6,
-        blending: THREE.AdditiveBlending
+        blending: THREE.AdditiveBlending,
+        depthTest: false,
+        depthWrite: false
       });
       const sparkle = new THREE.Sprite(sparkMat);
       sparkle.scale.set(2.5, 2.5, 1);
@@ -457,10 +468,12 @@
         map: glowTexture,
         color: colorSet.glow,
         transparent: true, opacity: 0.15,
-        blending: THREE.AdditiveBlending
+        blending: THREE.AdditiveBlending,
+        depthTest: false,
+        depthWrite: false
       });
       const glow = new THREE.Sprite(glowMat);
-      glow.scale.set(6, 6, 1);
+      glow.scale.set(3, 3, 1);
       glow.position.copy(basePos);
       scene.add(glow);
       
@@ -536,7 +549,9 @@
         map: jewelTexture,
         color: colorSet.glow,
         transparent: true, opacity: 0.5,
-        blending: THREE.AdditiveBlending
+        blending: THREE.AdditiveBlending,
+        depthTest: false,
+        depthWrite: false
       });
       const sparkle = new THREE.Sprite(sparkMat);
       sparkle.scale.set(2.8, 2.8, 1);
@@ -547,10 +562,12 @@
         map: glowTexture,
         color: colorSet.glow,
         transparent: true, opacity: 0.12,
-        blending: THREE.AdditiveBlending
+        blending: THREE.AdditiveBlending,
+        depthTest: false,
+        depthWrite: false
       });
       const glow = new THREE.Sprite(glowMat);
-      glow.scale.set(6, 6, 1);
+      glow.scale.set(3, 3, 1);
       glow.position.copy(basePos);
       scene.add(glow);
       
@@ -736,9 +753,9 @@
       // Sparkle rotation for glint effect
       node.sparkle.material.rotation = time * 0.5 + node.shimmerPhase;
       
-      // Glow pulse - keep scale smaller to avoid texture edge visibility
-      node.glow.material.opacity = 0.12 + shimmer * 0.05;
-      const glowScale = 4.0 + shimmer * 1.0;
+      // Glow pulse - smaller scale range to avoid texture edge visibility
+      node.glow.material.opacity = 0.15 + shimmer * 0.08;
+      const glowScale = 3.0 + shimmer * 0.5;
       node.glow.scale.set(glowScale, glowScale, 1);
     });
     

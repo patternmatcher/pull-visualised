@@ -65,7 +65,7 @@
         between vocabulary and activation dynamics.
       </p>
       <p class="act-explainer dim">
-        Each jewel below is a measured link between a word the model reaches for and something happening inside it.
+        Each node below is a measured link between a word the model reaches for and something happening inside it.
       </p>
     </div>
   </section>
