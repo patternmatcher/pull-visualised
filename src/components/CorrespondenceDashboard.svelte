@@ -204,10 +204,11 @@
 
 <style>
   .corr-journey {
-    min-height: 100vh;
+    min-height: 100vh; min-height: 100dvh;
     background: #06031a;
     color: #e0ddf0;
     position: relative;
+    touch-action: manipulation;
   }
   
   /* Starfield background */
@@ -692,10 +693,17 @@
   }
   
   @media (max-width: 768px) {
-    .act h1 { font-size: 1.6rem; }
+    .act { min-height: 70vh; min-height: 70dvh; }
+    .act h1 { font-size: 1.6rem; letter-spacing: 0.02em; }
     .act h2 { font-size: 1.3rem; }
-    .findings-grid { grid-template-columns: 1fr; }
+    .act-content { padding: 1.5rem; }
+    .act-explainer { font-size: 0.9rem; }
+    .findings-section { padding: 1rem; }
+    .findings-grid { grid-template-columns: 1fr; gap: 0.75rem; }
+    .finding-jewel { padding: 1rem; }
+    .control-section { padding: 1rem; gap: 1rem; }
     .conclusion-stats { gap: 1.5rem; }
     .cs-num { font-size: 1.5rem; }
+    .scroll-hint { margin-top: 2rem; }
   }
 </style>

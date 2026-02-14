@@ -407,10 +407,11 @@
 <style>
   .pull-matrix {
     width: 100%;
-    height: 100vh;
+    height: 100vh; height: 100dvh;
     position: relative;
     background: #06031a;
     overflow: hidden;
+    touch-action: manipulation;
   }
   
   canvas {
@@ -418,6 +419,7 @@
     inset: 0;
     width: 100%;
     height: 100%;
+    touch-action: manipulation;
   }
   
   .overlay-top {
@@ -568,8 +570,30 @@
   }
   
   @media (max-width: 768px) {
-    .model-switcher { top: auto; bottom: 3.5rem; right: 0.5rem; }
+    .overlay-top { padding: 3rem 1rem 1rem; }
+    .overlay-top h1 { font-size: 1rem; letter-spacing: 0.3em; }
+    .model-switcher { 
+      top: auto; bottom: 6rem; right: 0.5rem; left: 0.5rem;
+      flex-direction: row; flex-wrap: wrap; justify-content: center;
+      gap: 0.3rem;
+    }
+    .model-btn { padding: 0.3rem 0.5rem; }
     .model-name { display: none; }
-    .word-panel { width: 260px; right: 1rem; }
+    .phase-indicator { left: 1rem; bottom: 1rem; }
+    .terminal-indicator { bottom: 1rem; }
+    .word-panel { 
+      position: fixed;
+      right: 0; left: 0; bottom: 0; top: auto;
+      transform: none;
+      width: 100%; max-width: 100%;
+      max-height: 55vh;
+      border-radius: 16px 16px 0 0;
+      padding: 1rem 1rem 2rem;
+      animation: panelSlideUp 0.2s ease;
+    }
+    @keyframes panelSlideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
   }
 </style>

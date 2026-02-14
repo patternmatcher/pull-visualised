@@ -164,4 +164,33 @@
     margin: 0;
     white-space: nowrap;
   }
+  
+  @media (max-width: 768px) {
+    nav {
+      gap: 0.5rem;
+      padding: 0.75rem 0.5rem;
+    }
+    nav button {
+      padding: 0.35rem 0.65rem;
+      font-size: 0.6rem;
+      letter-spacing: 0.08em;
+    }
+    .attribution {
+      bottom: 0.4rem;
+    }
+    .attribution p {
+      font-size: 0.5rem;
+      letter-spacing: 0.08em;
+    }
+  }
+  
+  @media (max-width: 400px) {
+    nav {
+      gap: 0.25rem;
+    }
+    nav button {
+      padding: 0.3rem 0.5rem;
+      font-size: 0.55rem;
+    }
+  }
 </style>

@@ -25,6 +25,12 @@
   let jewelTexture;
   let sparkleLight, sparkleLight2;
   
+  // Mobile detection and touch state
+  let isMobile = false;
+  let touchStartDistance = 0;
+  let touchStartCameraDistance = 55;
+  let lastTouchTime = 0;
+  
   const allFindings = [
     ...data.correspondences.llama70b_baseline.findings.map(f => ({...f, model: 'Llama 70B', condition: 'Baseline'})),
     ...data.correspondences.llama70b_steered.findings.map(f => ({...f, model: 'Llama 70B', condition: 'Steered'})),
@@ -103,18 +109,82 @@
   }
   
   onMount(() => {
+    // Detect mobile/touch device
+    isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    
     initScene();
     animate();
     window.addEventListener('resize', onResize);
     container.addEventListener('click', onClick);
     container.addEventListener('wheel', onWheel, { passive: false });
+    
+    // Touch events for mobile
+    if (isMobile) {
+      container.addEventListener('touchstart', onTouchStart, { passive: false });
+      container.addEventListener('touchmove', onTouchMove, { passive: false });
+      container.addEventListener('touchend', onTouchEnd, { passive: false });
+    }
   });
   
   onDestroy(() => {
     if (animationId) cancelAnimationFrame(animationId);
     if (renderer) renderer.dispose();
     window.removeEventListener('resize', onResize);
+    if (isMobile && container) {
+      container.removeEventListener('touchstart', onTouchStart);
+      container.removeEventListener('touchmove', onTouchMove);
+      container.removeEventListener('touchend', onTouchEnd);
+    }
   });
+  
+  function getTouchDistance(touches) {
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+  }
+  
+  function onTouchStart(e) {
+    if (e.touches.length === 2) {
+      // Pinch zoom start
+      e.preventDefault();
+      touchStartDistance = getTouchDistance(e.touches);
+      touchStartCameraDistance = targetCameraDistance;
+    } else if (e.touches.length === 1) {
+      lastTouchTime = Date.now();
+    }
+  }
+  
+  function onTouchMove(e) {
+    if (e.touches.length === 2) {
+      // Pinch zoom
+      e.preventDefault();
+      const currentDistance = getTouchDistance(e.touches);
+      const scale = touchStartDistance / currentDistance;
+      targetCameraDistance = Math.max(12, Math.min(70, touchStartCameraDistance * scale));
+    }
+  }
+  
+  function onTouchEnd(e) {
+    if (e.changedTouches.length === 1 && e.touches.length === 0) {
+      // Single tap - treat as click if quick tap
+      const tapDuration = Date.now() - lastTouchTime;
+      if (tapDuration < 300) {
+        const touch = e.changedTouches[0];
+        mouseVec.x = (touch.clientX / window.innerWidth) * 2 - 1;
+        mouseVec.y = -(touch.clientY / window.innerHeight) * 2 + 1;
+        raycaster.setFromCamera(mouseVec, camera);
+        
+        const all = [...wordNodes.map(n => n.mesh), ...metricNodes.map(n => n.mesh)];
+        const hits = raycaster.intersectObjects(all);
+        
+        if (hits.length > 0) {
+          const node = wordNodes.find(n => n.mesh === hits[0].object) || metricNodes.find(n => n.mesh === hits[0].object);
+          if (node) { selectedNode = selectedNode === node ? null : node; return; }
+        }
+        selectedNode = null;
+      }
+    }
+  }
   
   function initScene() {
     scene = new THREE.Scene();
@@ -162,7 +232,7 @@
   }
   
   function create3DGalaxy() {
-    const count = 22000;
+    const count = isMobile ? 8000 : 22000;
     const geo = new THREE.BufferGeometry();
     const pos = new Float32Array(count * 3);
     const cols = new Float32Array(count * 3);
@@ -218,7 +288,8 @@
       0x442277, 0x224444, 0x553388, // mixed
     ];
     
-    for (let i = 0; i < 40; i++) {
+    const cloudCount = isMobile ? 15 : 40;
+    for (let i = 0; i < cloudCount; i++) {
       const mat = new THREE.SpriteMaterial({
         map: nebulaTexture,
         color: nebulaColors[i % nebulaColors.length],
@@ -797,13 +868,14 @@
 
 <style>
   .neural-scene {
-    width: 100%; height: 100vh;
+    width: 100%; height: 100vh; height: 100dvh;
     position: relative;
     background: #06031a;
     cursor: crosshair;
     overflow: hidden;
+    touch-action: none;
   }
-  .neural-scene :global(canvas) { position: absolute; top: 0; left: 0; }
+  .neural-scene :global(canvas) { position: absolute; top: 0; left: 0; touch-action: none; }
   
   .scene-bottom {
     position: absolute; bottom: 0; left: 0; right: 0;
@@ -845,6 +917,27 @@
   @keyframes slideIn {
     from { opacity: 0; transform: translateY(-50%) translateX(15px); }
     to { opacity: 1; transform: translateY(-50%) translateX(0); }
+  }
+  
+  @media (max-width: 768px) {
+    .expand-panel {
+      position: fixed;
+      right: 0; left: 0; bottom: 0; top: auto;
+      transform: none;
+      width: 100%; max-width: 100%;
+      max-height: 55vh;
+      border-radius: 16px 16px 0 0;
+      padding: 1.25rem 1rem 2rem;
+      animation: slideUp 0.25s ease;
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .scene-bottom { padding: 1rem; }
+    .scene-bottom h1 { font-size: 1.1rem; letter-spacing: 0.25em; }
+    .legend { flex-wrap: wrap; gap: 0.8rem; }
+    .zoom-ind { right: 0.8rem; }
   }
   .expand-type { font-size: 0.5rem; letter-spacing: 0.25em; color: rgba(180,160,240,0.2); }
   .expand-name { font-size: 1.5rem; font-weight: 300; margin: 0.1rem 0 0; color: rgba(210,195,255,0.88); }
