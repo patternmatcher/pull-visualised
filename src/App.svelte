@@ -3,17 +3,17 @@
   import NeuralScene from './components/NeuralScene.svelte';
   import CorrespondenceDashboard from './components/CorrespondenceDashboard.svelte';
   import PullVisualizer from './components/PullVisualizer.svelte';
-  
+
   let currentScene = 'network';
   let data = null;
   let loaded = false;
-  
+
   onMount(async () => {
     const res = await fetch(import.meta.env.BASE_URL + 'data/correspondence_data.json');
     data = await res.json();
     loaded = true;
   });
-  
+
   function navigate(scene) {
     currentScene = scene;
   }
@@ -37,7 +37,7 @@
         The Pull
       </button>
     </nav>
-    
+
     <div class="scene-container">
       {#if currentScene === 'network'}
         <NeuralScene {data} />
@@ -47,9 +47,10 @@
         <PullVisualizer {data} />
       {/if}
     </div>
-    
+
     <div class="attribution">
       <p>The Pull Methodology — Zachary Pedram Dadfar</p>
+      <p class="links"><a href="mailto:zack.dadfar@automatica.sbs">zack.dadfar@automatica.sbs</a> · <a href="https://arxiv.org/abs/2602.11358" target="_blank">arXiv:2602.11358</a></p>
     </div>
   {/if}
 </main>
@@ -63,17 +64,17 @@
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     overflow-x: hidden;
   }
-  
+
   :global(*) {
     box-sizing: border-box;
   }
-  
+
   main {
     width: 100vw;
     min-height: 100vh;
     position: relative;
   }
-  
+
   .loading {
     display: flex;
     flex-direction: column;
@@ -82,25 +83,25 @@
     height: 100vh;
     gap: 1rem;
   }
-  
+
   .enso {
     font-size: 4rem;
     opacity: 0.6;
     animation: pulse 2s ease-in-out infinite;
   }
-  
+
   .loading p {
     font-size: 0.9rem;
     opacity: 0.4;
     letter-spacing: 0.2em;
     text-transform: lowercase;
   }
-  
+
   @keyframes pulse {
     0%, 100% { opacity: 0.3; transform: scale(1); }
     50% { opacity: 0.7; transform: scale(1.05); }
   }
-  
+
   nav {
     position: fixed;
     top: 0;
@@ -114,7 +115,7 @@
     background: linear-gradient(to bottom, rgba(3, 3, 8, 0.9) 0%, rgba(3, 3, 8, 0.4) 70%, transparent 100%);
     pointer-events: none;
   }
-  
+
   nav button {
     pointer-events: auto;
     background: rgba(3, 3, 8, 0.5);
@@ -129,25 +130,25 @@
     transition: all 0.3s ease;
     backdrop-filter: blur(8px);
   }
-  
+
   nav button:hover {
     border-color: rgba(180, 170, 220, 0.3);
     color: rgba(200, 190, 240, 0.7);
   }
-  
+
   nav button.active {
     border-color: rgba(140, 120, 255, 0.5);
     color: rgba(200, 190, 240, 0.85);
     background: rgba(140, 120, 255, 0.08);
     box-shadow: 0 0 15px rgba(140, 120, 255, 0.06);
   }
-  
+
   .scene-container {
     width: 100%;
     min-height: 100vh;
     padding-top: 0;
   }
-  
+
   .attribution {
     position: fixed;
     bottom: 0.75rem;
@@ -156,7 +157,7 @@
     z-index: 100;
     pointer-events: none;
   }
-  
+
   .attribution p {
     font-size: 0.6rem;
     color: rgba(180, 170, 220, 0.18);
@@ -165,6 +166,21 @@
     white-space: nowrap;
   }
   
+  .attribution .links {
+    margin-top: 0.25rem;
+    pointer-events: auto;
+  }
+  
+  .attribution a {
+    color: rgba(180, 170, 220, 0.35);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+  
+  .attribution a:hover {
+    color: rgba(180, 170, 220, 0.7);
+  }
+
   @media (max-width: 768px) {
     nav {
       gap: 0.5rem;
@@ -183,7 +199,7 @@
       letter-spacing: 0.08em;
     }
   }
-  
+
   @media (max-width: 400px) {
     nav {
       gap: 0.25rem;
